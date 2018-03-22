@@ -466,6 +466,8 @@ typedef long long mstime_t; /* millisecond time type. */
  * encoding version. */
 #define OBJ_MODULE 5
 
+#define OBJ_ISET 6
+
 /* Extract encver / signature from a module type ID. */
 #define REDISMODULE_TYPE_ENCVER_BITS 10
 #define REDISMODULE_TYPE_ENCVER_MASK ((1<<REDISMODULE_TYPE_ENCVER_BITS)-1)
@@ -576,6 +578,7 @@ typedef struct RedisModuleDigest {
 #define OBJ_ENCODING_SKIPLIST 7  /* Encoded as skiplist */
 #define OBJ_ENCODING_EMBSTR 8  /* Embedded sds string encoding */
 #define OBJ_ENCODING_QUICKLIST 9 /* Encoded as linked list of ziplists */
+#define OBJ_ENCODING_AVLTREE 10
 
 #define LRU_BITS 24
 #define LRU_CLOCK_MAX ((1<<LRU_BITS)-1) /* Max value of obj->lru */
@@ -777,6 +780,26 @@ typedef struct zset {
     dict *dict;
     zskiplist *zsl;
 } zset;
+
+/* ISET specialized AVL structures */
+typedef struct avlNode {
+       robj *obj;
+       double scores[2];
+       double subLeftMax, subRightMax;
+       char balance;
+       struct avlNode *left, *right, *parent, *next;
+} avlNode;
+
+typedef struct avl {
+       struct avlNode *root;
+       dict *dict;
+       unsigned long size;
+} avl;
+
+typedef struct iset {
+       avl *avltree;
+       dict *dict;
+} iset;
 
 typedef struct clientBufferLimitsConfig {
     unsigned long long hard_limit_bytes;
@@ -1292,6 +1315,7 @@ extern struct sharedObjectsStruct shared;
 extern dictType objectKeyPointerValueDictType;
 extern dictType setDictType;
 extern dictType zsetDictType;
+extern dictType isetDictType;
 extern dictType clusterNodesDictType;
 extern dictType clusterNodesBlackListDictType;
 extern dictType dbDictType;
@@ -1457,6 +1481,7 @@ robj *createIntsetObject(void);
 robj *createHashObject(void);
 robj *createZsetObject(void);
 robj *createZsetZiplistObject(void);
+robj *createIsetObject(void);
 robj *createModuleObject(moduleType *mt, void *value);
 int getLongFromObjectOrReply(client *c, robj *o, long *target, const char *msg);
 int checkType(client *c, robj *o, int type);
@@ -1472,6 +1497,18 @@ int collateStringObjects(robj *a, robj *b);
 int equalStringObjects(robj *a, robj *b);
 unsigned long long estimateObjectIdleTime(robj *o);
 #define sdsEncodedObject(objptr) (objptr->encoding == OBJ_ENCODING_RAW || objptr->encoding == OBJ_ENCODING_EMBSTR)
+
+avl *avlCreate(void);
+avlNode *avlCreateNode(double lscore, double rscore, robj *obj);
+void avlFreeNode(avlNode *node, int removeList);
+void avlFree(avl *tree);
+int avlNodeCmp(avlNode *a, avlNode *b);
+void avlLeftRotation(avl * tree, avlNode *locNode);
+void avlRightRotation(avl * tree, avlNode *locNode);
+void avlResetBalance(avlNode *locNode);
+int avlInsertNode(avl * tree, avlNode *locNode, avlNode *insertNode);
+avlNode *avlInsert(avl *tree, double lscore, double rscore, robj *obj);
+long long isetLength(robj *obj);
 
 /* Synchronous I/O with timeout */
 ssize_t syncWrite(int fd, char *ptr, ssize_t size, long long timeout);
@@ -1919,6 +1956,10 @@ void zremCommand(client *c);
 void zscoreCommand(client *c);
 void zremrangebyscoreCommand(client *c);
 void zremrangebylexCommand(client *c);
+void iaddCommand(client *c);
+void iremCommand(client *c);
+void irembystabCommand(client *c);
+void istabCommand(client *c);
 void multiCommand(client *c);
 void execCommand(client *c);
 void discardCommand(client *c);

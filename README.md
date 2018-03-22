@@ -1,4 +1,22 @@
-This README is just a fast *quick start* document. You can find more detailed documentation at [redis.io](https://redis.io).
+Redis 4.0.8 with Interval Sets
+--------------
+
+    redis> iadd test 0 10 test1
+    (integer) 1
+    redis> iadd test 0 20 test2
+    (integer) 1
+    redis> iadd test 10 30 test3
+    (integer) 1
+    redis> istab test 5
+    1) "test1"
+    2) "test2"
+    redis> istab test 15
+    1) "test3"
+    2) "test2"
+    redis> istab test 25
+    1) "test3"
+
+For more info, please visit: http://www.starkiller.net/2013/05/03/hacking-redis-adding-interval-sets/
 
 What is Redis?
 --------------

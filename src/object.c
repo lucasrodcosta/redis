@@ -232,6 +232,17 @@ robj *createZsetZiplistObject(void) {
     return o;
 }
 
+robj *createIsetObject(void) {
+    avl *a = avlCreate();
+    robj *o = createObject(OBJ_ISET,a);
+    o->encoding = OBJ_ENCODING_AVLTREE;
+    return o;
+}
+
+void freeIsetObject(robj *o) {
+    avlFree(o->ptr);
+}
+
 robj *createModuleObject(moduleType *mt, void *value) {
     moduleValue *mv = zmalloc(sizeof(*mv));
     mv->type = mt;
@@ -314,6 +325,7 @@ void decrRefCount(robj *o) {
         case OBJ_LIST: freeListObject(o); break;
         case OBJ_SET: freeSetObject(o); break;
         case OBJ_ZSET: freeZsetObject(o); break;
+        case OBJ_ISET: freeIsetObject(o); break;
         case OBJ_HASH: freeHashObject(o); break;
         case OBJ_MODULE: freeModuleObject(o); break;
         default: serverPanic("Unknown object type"); break;

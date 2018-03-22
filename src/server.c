@@ -198,6 +198,10 @@ struct redisCommand redisCommandTable[] = {
     {"zrank",zrankCommand,3,"rF",0,NULL,1,1,1,0,0},
     {"zrevrank",zrevrankCommand,3,"rF",0,NULL,1,1,1,0,0},
     {"zscan",zscanCommand,-3,"rR",0,NULL,1,1,1,0,0},
+    {"iadd",iaddCommand,-5,"wm",0,NULL,1,1,1,0,0},
+    {"irem",iremCommand,-3,"w",0,NULL,1,1,1,0,0},
+    {"irembystab",irembystabCommand,3,"w",0,NULL,1,1,1,0,0},
+    {"istab",istabCommand,-3,"r",0,NULL,1,1,1,0,0},
     {"hset",hsetCommand,-4,"wmF",0,NULL,1,1,1,0,0},
     {"hsetnx",hsetnxCommand,4,"wmF",0,NULL,1,1,1,0,0},
     {"hget",hgetCommand,3,"rF",0,NULL,1,1,1,0,0},
@@ -548,6 +552,15 @@ dictType objectKeyPointerValueDictType = {
     NULL,                      /* val dup */
     dictEncObjKeyCompare,      /* key compare */
     dictObjectDestructor, /* key destructor */
+    NULL                       /* val destructor */
+};
+
+dictType isetDictType = {
+    dictEncObjHash,            /* hash function */
+    NULL,                      /* key dup */
+    NULL,                      /* val dup */
+    dictEncObjKeyCompare,      /* key compare */
+    dictObjectDestructor,      /* key destructor */
     NULL                       /* val destructor */
 };
 

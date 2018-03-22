@@ -80,6 +80,7 @@
 #define RDB_TYPE_MODULE 6
 #define RDB_TYPE_MODULE_2 7 /* Module value with annotations for parsing without
                                the generating module being loaded. */
+#define RDB_TYPE_ISET   8
 /* NOTE: WHEN ADDING NEW RDB TYPE, UPDATE rdbIsObjectType() BELOW */
 
 /* Object types for encoded objects. */
