@@ -16,7 +16,11 @@ Redis 4.0.8 with Interval Sets
     redis> istab test 25
     1) "test3"
 
-For more info, please visit: http://www.starkiller.net/2013/05/03/hacking-redis-adding-interval-sets/
+For more info, please visit: http://www.starkiller.net/2013/05/03/hacking-redis-adding-interval-sets/ (or https://web.archive.org/web/20171210000653/http://www.starkiller.net/2013/05/03/hacking-redis-adding-interval-sets/).
+
+Docker Hub
+--------------
+https://hub.docker.com/r/lucasrodcosta/redis/
 
 What is Redis?
 --------------
